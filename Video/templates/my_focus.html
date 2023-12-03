@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script>
+
+    </script>
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:">首页</a></li>
+        <li class="breadcrumb-item active" aria-current="page">我的关注</li>
+    </ol>
+</nav>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>用户名</th>
+                        <th>性别</th>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>地址</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for u in user_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="/videos/vid/otherlist/?uid={{ u.id }}">{{ u.username }}</a></td>
+                        <td>{{ u.sex|default:'' }}</td>
+                        <td>{{ u.real_name|default:'' }}</td>
+                        <td>{{ u.phone|default:'' }}</td>
+                        <td>{{ u.nationality|default:'中国' }}-{{ u.city|default:'' }}</td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

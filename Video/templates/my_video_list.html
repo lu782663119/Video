@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script>
+        function scanMedia(id,url,title) {
+            // id视频ID， url视频访问的URL
+            $.ajax({  // 发送ajax，每次播放视频，需要修改数据库的字段
+                url: '/videos/play_video/',
+                type: 'get',
+                data: {"id": id},
+                dataType: "json",
+                success: function (data) {
+                    if (data.length != 0) {
+
+                        $('#media_title').text(title)
+                        $('#media_src').attr("src", 'http://127.0.0.1:8000'+url);
+                        document.querySelector('video').load();//video重载，以免读取src失败
+                        $('#video_close').click(function () {
+                            document.getElementById("myVideo").pause()
+                            //$('#myVideo').pause()
+                        })
+                        $("#exampleLargeModal").modal('show');  // 让弹窗显示出来
+
+                    } else {
+                        alert('失败！！！');
+                    }
+                }
+            })
+
+
+        }
+
+    function delete_video(id, title) {
+            // 设置弹出框的提示内容
+            $('#video_delete_message').text('确认要删除 '+ title + ', 这个视频吗？')
+            // 给确认删除的按钮添加一个鼠标点击事件
+            $('#delete_btn').click(function () {
+
+                document.location.href = '/videos/delete_video/?id='+id
+            })
+            $("#delete_video").modal('show');
+        }
+    </script>
+
+    <!-- 确认删除视频的弹窗 -->
+    </button>
+    <div class="modal fade" id="delete_video" tabindex="-1" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="video_delete_message">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        取消
+                    </button>
+                    <button type="button" id="delete_btn" class="btn btn-primary">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  视频播放的弹窗 -->
+    <div class="modal fade" id="exampleLargeModal" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="media_title"></h5>
+                    <button type="button" id="video_close" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 500px">
+                    <video controls="controls" width="100%" height="100%" autoplay="autoplay" volume="1" id="myVideo"
+                           loop="loop">
+                        <source id="media_src" src="" type="video/mp4"/>
+                    </video>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="card-title">我的视频</h5>
+
+            <hr>
+
+            <div class="row row-cols-2 g-3">
+                {% for video in video_page.object_list %}
+
+                    <div class="col">
+                        <div class="card border-0 shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <a href="javascript:scanMedia({{ video.id }},'{{ video.video_file.url }}', '{{ video.title }}')"
+                                       class="col-md-6 bg-light  d-none d-md-flex align-items-center justify-content-center bsa-art-thumbs-wrapper">
+                                        <img src="/media/{{ video.video_icon }}" class="img-fluid" alt="视频截图">
+                                    </a>
+                                    <div class="col-md-6">
+                                        <div class="d-flex flex-column gap-2">
+                                            <a href="javascript:scanMedia({{ video.id }},'{{ video.video_file.url }}', '{{ video.title }}')"
+                                               class="h4 text-decoration-none link-dark bsa-ellipsis2">
+                                                <span class="badge bg-warning me-1 align-text-bottom">播放</span>
+                                                <span class="badge bg-danger me-1 align-text-bottom">{{ video.title }}</span>
+                                            </a>
+
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                <a href="javascript:" class="text-decoration-none">
+                                                    <img src="https://temp.im/100x100"
+                                                         class="bsa-width-40 bsa-height-40 rounded-circle" alt="作者头像">
+                                                    <span class="text-muted">{{ user.username }}</span>
+                                                </a>
+                                                <div class="text-muted">
+                                                    <i class="bi bi-clock-fill"></i>
+                                                    <span class="ms-1">{{ video.create_time|date:"Y-m-d H:i:s" }}</span>
+                                                </div>
+                                                <div class="text-muted">
+                                                    <span class="ms-1">播放次数：{{ video.running_count|default:"0" }}次</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-secondary bsa-ellipsis3">
+                                                {{ video.remark }}
+                                            </div>
+
+                                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                                <a href="javascript:"
+                                                   class="badge rounded-pill bg-success text-white text-decoration-none">修改</a>
+                                                <a href="javascript:delete_video({{ video.id }},'{{ video.title }}')"
+                                                   class="badge rounded-pill bg-primary text-white text-decoration-none">删除</a>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <hr>
+            <div class="row row-cols-1 g3">
+                <div class="col">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <!-- 逻辑判断，如果有前一页，则可以点击上一页按钮  -->
+                            {% if video_page.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="/videos/vid/mylist/?page={{ video_page.previous_page_number }}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">«</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <!-- 禁用按钮  -->
+                                <li class="disabled">
+                                    <a href="" aria-label="Previous">
+                                        <span aria-hidden="true">«</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <!-- 呈现所有的页码 -->
+                            {% for page_num in page_range %}
+                                {% if page_num == current_page %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="/videos/vid/mylist/?page={{ page_num }}">{{ page_num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+
+                            <!-- 逻辑判断，如果有后一页，则可以点击下一页按钮  -->
+                            {% if video_page.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="/videos/vid/mylist/?page={{ video_page.next_page_number }}"
+                                       aria-label="Next">
+                                        <span aria-hidden="true">»</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <!-- 禁用按钮  -->
+                                <li class="disabled">
+                                    <a href="" aria-label="Next">
+                                        <span aria-hidden="true">»</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

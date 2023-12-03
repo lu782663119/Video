@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script>
+        function scanMedia(id, url) {
+
+            $.ajax({
+                url: '/videos/play_video/',
+                type: 'get',
+                data: {"id": id},
+                dataType: "json",
+                success: function (data) {
+                    if (data.length != 0) {
+
+
+                        $('#media_src').attr("src", 'http://127.0.0.1:8000' + url);
+                        document.querySelector('video').load();//video重载，以免读取src失败
+                        $('#video_close').click(function () {
+                            document.getElementById("myVideo").pause()
+                            //$('#myVideo').pause()
+                        })
+                        $("#exampleLargeModal").modal('show');
+
+                    } else {
+                        alert('失败！！！');
+                    }
+                }
+            })
+
+
+        }
+    </script>
+
+
+    <!-- 视频播放的弹窗 -->
+    <div class="modal fade" id="exampleLargeModal" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" id="video_close" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="height: 500px">
+                    <video controls="controls" width="100%" height="100%" autoplay="autoplay" volume="1" id="myVideo"
+                           loop="loop">
+                        <source id="media_src" src="" type="video/mp4"/>
+                    </video>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <nav style="--bs-breadcrumb-divider: '|';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="javascript:">首页</a></li>
+            <li class="breadcrumb-item"><a href="javascript:">我的关注</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ my_user.username }} 的视频列表</li>
+        </ol>
+    </nav>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="card-title">我的视频</h5>
+
+            <hr>
+
+            <div class="row row-cols-2 g-3">
+                {% for video in video_list %}
+
+                    <div class="col">
+                        <div class="card border-0 shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <a href="javascript:scanMedia({{ video.id }},'{{ video.video_file.url }}')"
+                                       class="col-md-7 bg-light  d-none d-md-flex align-items-center justify-content-center bsa-art-thumbs-wrapper">
+                                        <img src="/media/{{ video.video_icon }}" class="img-fluid" alt="视频截图">
+                                    </a>
+                                    <div class="col-md-5">
+                                        <div class="d-flex flex-column gap-2">
+                                            <a href="javascript:scanMedia({{ video.id }},'{{ video.video_file.url }}')"
+                                               class="h4 text-decoration-none link-dark bsa-ellipsis2">
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                        data-bs-target="#exampleLargeModal">播放
+                                                </button>
+                                                {#                                                <span class="badge bg-warning me-1 align-text-bottom">播放</span>#}
+                                                <span class="badge bg-danger me-1 align-text-bottom">{{ video.title }}</span>
+                                            </a>
+
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                <a href="javascript:" class="text-decoration-none">
+                                                    <img src="https://temp.im/100x100"
+                                                         class="bsa-width-40 bsa-height-40 rounded-circle" alt="作者头像">
+                                                    <span class="text-muted">{{ user.username }}</span>
+                                                </a>
+                                                <div class="text-muted">
+                                                    <i class="bi bi-clock-fill"></i>
+                                                    <span class="ms-1">{{ video.create_time|date:"Y-m-d H:i:s" }}</span>
+                                                </div>
+                                                <div class="text-muted">
+                                                    <span class="ms-1">播放次数：{{ video.running_count|default:"0" }}次</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-secondary bsa-ellipsis3">
+                                                {{ video.remark }}
+                                            </div>
+
+                                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                                <a href="javascript:"
+                                                   class="badge rounded-pill bg-success text-white text-decoration-none">修改</a>
+                                                <a href="javascript:delete_video({{ video.id }},'{{ video.title }}')"
+                                                   class="badge rounded-pill bg-primary text-white text-decoration-none">删除</a>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+{% endblock content %}

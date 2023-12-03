@@ -37,7 +37,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="password_confirm" class="form-label">确认密码</label>
-                                <input type="text" class="form-control" id="password_confirm" name="password_confirm"
+                                <input type="password" class="form-control" id="password_confirm" name="password_confirm"
                                        autocomplete="off">
                             </div>
                             <div class="mb-3">
@@ -107,7 +107,7 @@
                     remote: {
                         type: 'post',
                         url: '/users/check_username/',
-                        headers:{'X-CSRFToken':$('[name="csrfmiddlewaretoken"]').val()},
+                        headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
                         data: {
                             type: 'save',
                         },
@@ -163,7 +163,23 @@
 
                 }
             },
-        }
+            captcha: {
+                validators: {
+                    notEmpty: true,
+                    remote: {
+                        type: 'post',
+                        url: '/users/verify_code/',
+                        headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
+                        data: {
+                            type: 'save',
+                        },
+                        //请求失败的消息
+                        message: "系统繁忙,请稍后再试",
+                        delay: 1000
+                    }
+                }
+            }
+        },
     }).on('success.form.fv', function (e) {
         //阻止表单提交
         e.preventDefault();
@@ -173,19 +189,20 @@
 
         //得到序列化数据
         $.ajax({
-            url: "/reg.php",
+            url: "/users/submit_register/",
             method: 'post',
-            headers:{'X-CSRFToken':$('[name="csrfmiddlewaretoken"]').val()},
+            headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
             data: data,
         }).then(function (res) {
             if (res.code === 200) {
                 //注册成功
+                alert('注册成功')
             } else {
                 //注册失败
+                alert('注册失败')
             }
         });
     });
-
 
 
 </script>

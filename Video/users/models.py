@@ -11,7 +11,7 @@ class UserModel(AbstractUser, BaseModel):
     real_name = models.CharField(max_length=20, verbose_name='真实姓名', null=True, blank=True)
     nationality = models.CharField(max_length=20, verbose_name='国籍', null=True, blank=True)
     city = models.CharField(max_length=20, verbose_name='城市', null=True, blank=True)
-    user_icon = models.FileField(max_length=200, verbose_name='用户头像', null=True, blank=True)
+    user_icon = models.FileField(max_length=200, verbose_name='用户头像', null=True, blank=True,default='avatar.jpg')
     age = models.IntegerField(verbose_name='年龄', null=True, blank=True)
     sex = models.CharField(max_length=4, verbose_name='性别', null=True, blank=True)
 

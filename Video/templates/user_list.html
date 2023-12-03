@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script>
+    function add_focus(f_id){
+        document.location.href='/users/add_focus/?focus_id='+f_id
+    }
+    </script>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead>
+                    <tr>
+
+                        <th>编号</th>
+                        <th>用户名</th>
+                        <th>性别</th>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>地址</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for u in user_page.object_list %}
+                    
+
+                    
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.sex|default:'' }}</td>
+                        <td>{{ u.real_name|default:'' }}</td>
+                        <td>{{ u.phone|default:'' }}</td>
+                        <td>{{ u.nationality|default:'中国' }}-{{ u.city|default:'' }}</td>
+                        <td>
+                            {% if u.id in focus_ids %}
+                                <button type="button" class="btn btn-secondary btn-lg" disabled="">已关注</button>
+                            {% else %}
+                                <button type="button" onclick="add_focus({{ u.id }})" class="btn btn-primary px-5">关注</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="row row-cols-1 g3">
+                <div class="col">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <!-- 逻辑判断，如果有前一页，则可以点击上一页按钮  -->
+                            {% if user_page.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="/users/list_user/?page={{ user_page.previous_page_number }}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <!-- 禁用按钮  -->
+                                <li class="disabled">
+                                    <a href="" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <!-- 呈现所有的页码 -->
+                            {% for page_num in page_range %}
+                                {% if page_num == current_page %}
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="/users/list_user/?page={{ page_num }}">{{ page_num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+
+                            <!-- 逻辑判断，如果有后一页，则可以点击下一页按钮  -->
+                            {% if user_page.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="/users/list_user/?page={{ user_page.next_page_number }}"
+                                       aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <!-- 禁用按钮  -->
+                                <li class="disabled">
+                                    <a href="" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock content %}
